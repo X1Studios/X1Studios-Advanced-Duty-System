@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>X1S Duty System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ================= DUTY MENU ================= -->
+    <div class="menu" id="dutyMenu">
+        <div class="menu-banner"></div>
+
+        <h2>Duty Selection</h2>
+
+        <select id="department"></select>
+
+        <input id="name" placeholder="Enter your name">
+        <input id="callsign" placeholder="Enter your callsign">
+        <input id="rank" placeholder="Enter your rank">
+
+        <div class="buttons">
+            <button onclick="closeMenu()">Cancel</button>
+            <button onclick="confirmDuty()">Confirm</button>
+        </div>
+    </div>
+
+    <!-- ================= SUPERVISOR MENU ================= -->
+    <div class="menu" id="supervisorMenu">
+        <div class="menu-banner"></div>
+
+        <h2>Supervisor Panel</h2>
+
+        <input
+            id="searchInput"
+            placeholder="Search name, callsign, department"
+            onkeyup="filterSupervisor()"
+        >
+
+        <table>
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Name</th>
+                    <th onclick="sortTable(1)">Callsign</th>
+                    <th onclick="sortTable(2)">Rank</th>
+                    <th onclick="sortTable(3)">Dept</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="supervisorList"></tbody>
+        </table>
+
+        <div class="buttons">
+            <button onclick="closeMenu()">Close</button>
+        </div>
+    </div>
+
+    <!-- ================= CONFIRM FORCE OFF MODAL ================= -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-box">
+            <h3>Confirm Action</h3>
+            <p>Force this officer off duty?</p>
+
+            <div class="buttons">
+                <button onclick="closeModal()">Cancel</button>
+                <button class="danger" onclick="confirmModalAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= TOAST ================= -->
+    <div id="toast" class="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
