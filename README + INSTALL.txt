@@ -15,4 +15,11 @@ You may add as many departments as you want but each new department must a webho
 
 Please join our Discord and open a ticket for any help
 
+
 X1Studios - https://discord.gg/TqcPD9Xee3
+
+
+!!! UPDATE - v1.0.1 !!!
+- Fixed Blips Not Showing Up For Every On Duty Officer
+- No Longer Able To See Your Own Blip
+- Added Version Checker
