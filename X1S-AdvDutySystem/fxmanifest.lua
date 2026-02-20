@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'X1Studios'
 description 'Advanced Standalone Duty System'
-version '1.0.1'
+version '1.1.0'
 
 ui_page 'html/index.html'
 
@@ -25,4 +25,3 @@ client_scripts {
 server_scripts {
     'server/server.lua'
 }
-
