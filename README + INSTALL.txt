@@ -23,3 +23,11 @@ X1Studios - https://discord.gg/TqcPD9Xee3
 - Fixed Blips Not Showing Up For Every On Duty Officer
 - No Longer Able To See Your Own Blip
 - Added Version Checker
+
+----------------------------------------------------------
+
+!!! UPDATE - v1.1.0 !!!
+- Added /911 Call System
+- 911 Calls Get Sent To All On Duty Officers Only
+- 911 Call Blip Of The Location
+- 911 Call Webhook That Pings A Role
