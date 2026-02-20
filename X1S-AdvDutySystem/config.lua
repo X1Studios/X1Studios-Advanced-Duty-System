@@ -12,6 +12,9 @@ Config.Webhooks = {
     SAGW = "WEBHOOK_LINK_HERE"
 }
 
+Config.DispatchWebhook = "WEBHOOK_LINK_HERE"
+Config.LEORoleID = "ROLEID_HERE" -- discord role ID to ping
+
 Config.Departments = {
     LSPD = {
         label = "Los Santos Police Department",
@@ -45,3 +48,4 @@ Config.Departments = {
         webhookThumbnail = "https://imgur.com/DbT5klb.png"
     }
 }
+
