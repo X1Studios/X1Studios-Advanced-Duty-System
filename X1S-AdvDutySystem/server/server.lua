@@ -9,7 +9,8 @@ AddEventHandler('onResourceStart', function(resourceName)
   / _ \   | |  ___) |
  /_/ \_\  |_| |____/ 
 
-      X1Studios Advanced Duty System
+  X1Studios Advanced
+      Duty System
     ]])
 end)
 
@@ -22,6 +23,18 @@ local function SendDeptWebhook(department, payload)
 
     PerformHttpRequest(
         webhook,
+        function() end,
+        'POST',
+        json.encode(payload),
+        { ['Content-Type'] = 'application/json' }
+    )
+end
+
+local function SendDispatchWebhook(payload)
+    if not Config.DispatchWebhook or Config.DispatchWebhook == "" then return end
+
+    PerformHttpRequest(
+        Config.DispatchWebhook,
         function() end,
         'POST',
         json.encode(payload),
@@ -254,6 +267,66 @@ RegisterNetEvent('x1s-duty:requestSupervisorMenu', function()
     end
 
     TriggerClientEvent('x1s-duty:openSupervisor',src,list)
+end)
+
+-- ======================
+-- 911 DISPATCH SYSTEM
+-- ======================
+
+RegisterNetEvent('x1s-duty:911Call', function(reason, coords, street)
+
+    local src = source
+    if not reason or not coords or not street then return end
+
+    local callerName = GetPlayerName(src) or "Unknown"
+
+    local payload = {
+        caller = callerName,
+        id = src,
+        reason = reason,
+        street = street,
+        coords = coords
+    }
+
+    -- confirm to caller
+    TriggerClientEvent('x1s-duty:911Confirmed', src)
+
+    -- send to on-duty cops
+    for officer,_ in pairs(DutyPlayers) do
+        TriggerClientEvent('x1s-duty:receive911', officer, payload)
+    end
+
+    -- webhook + role ping
+    local mention = Config.LEORoleID and ("<@&%s>"):format(Config.LEORoleID) or ""
+
+    SendDispatchWebhook({
+        content = mention,
+        allowed_mentions = { parse = { "roles" } },
+        username = "911 Dispatch",
+        embeds = {{
+            title = "🚨 911 Emergency Call",
+            color = 16711680,
+            fields = {
+                { name = "Caller", value = callerName, inline = true },
+                { name = "Server ID", value = tostring(src), inline = true },
+                { name = "Street", value = street, inline = false },
+                { name = "Report", value = reason, inline = false },
+                { name = "Coordinates",
+                  value = ("X: %.2f | Y: %.2f"):format(coords.x, coords.y),
+                  inline = false
+                }
+            },
+            footer = {
+                text = "X1Studios Dispatch System",
+                icon_url = Config.FooterIcon
+            },
+            timestamp = os.date('!%Y-%m-%dT%H:%M:%SZ')
+        }}
+    })
+
+    print(("[911] %s [%s] @ %s → %s")
+        :format(callerName, src, street, reason))
+
 end)
 
 -- ======================
