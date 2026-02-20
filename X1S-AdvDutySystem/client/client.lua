@@ -159,6 +159,102 @@ RegisterNetEvent('x1s-duty:syncBlips', function(players)
 end)
 
 -- ======================
+-- 911 Call System
+-- ======================
+
+RegisterCommand("911", function()
+    -- open on-screen keyboard
+    DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP8", "", "", "", "", "", 128)
+    while (UpdateOnscreenKeyboard() == 0) do
+        DisableAllControlActions(0)
+        Wait(0)
+    end
+
+    local reason = GetOnscreenKeyboardResult()
+    if not reason or reason == "" then
+        TriggerEvent('chat:addMessage', {
+            color = {255,0,0},
+            args = {"Dispatch", "911 call cancelled."}
+        })
+        return
+    end
+
+    local ped = PlayerPedId()
+    local coords = GetEntityCoords(ped)
+
+    local streetHash = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
+    local street = GetStreetNameFromHashKey(streetHash)
+
+    TriggerServerEvent('x1s-duty:911Call', reason, coords, street)
+end)
+
+-- Confirm to caller
+RegisterNetEvent('x1s-duty:911Confirmed', function()
+    TriggerEvent('chat:addMessage', {
+        color = {0,255,0},
+        args = {"X1S Dispatch", "✅ Your 911 call has been sent to emergency services."}
+    })
+end)
+
+-- Receive alert (on-duty cops only)
+RegisterNetEvent('x1s-duty:receive911', function(data)
+    -- Top divider (red)
+    TriggerEvent('chat:addMessage', {
+        color = {255, 0, 0},
+        multiline = true,
+        args = {"════════════ 🚨 911 DISPATCH 🚨 ════════════"}
+    })
+
+    -- Inner info (white) sent line by line
+    TriggerEvent('chat:addMessage', {
+        color = {255, 255, 0},
+        args = {("📞[Caller]: %s [%s]"):format(data.caller, data.id)}
+    })
+
+    TriggerEvent('chat:addMessage', {
+        color = {255, 255, 255},
+        args = {"────────────────────────────"}
+    })
+
+    TriggerEvent('chat:addMessage', {
+        color = {0, 128, 0},
+        args = {("🗺️[Location]: %s"):format(data.street)}
+    })
+
+    TriggerEvent('chat:addMessage', {
+        color = {255, 255, 255},
+        args = {"────────────────────────────"}
+    })
+
+    TriggerEvent('chat:addMessage', {
+        color = {255, 165, 0},
+        args = {("⚠️[Report]: %s"):format(data.reason)}
+    })
+
+    -- Bottom divider (red)
+    TriggerEvent('chat:addMessage', {
+        color = {255, 0, 0},
+        multiline = true,
+        args = {"══════════════════════════════════════"}
+    })
+
+    -- Blip for 2 minutes
+    local blip = AddBlipForCoord(data.coords.x, data.coords.y, data.coords.z)
+    SetBlipSprite(blip, 161)
+    SetBlipColour(blip, 1)
+    SetBlipScale(blip, 1.3)
+    SetBlipFlashes(blip, true)
+    BeginTextCommandSetBlipName("STRING")
+    AddTextComponentString("911 Call")
+    EndTextCommandSetBlipName(blip)
+
+    CreateThread(function()
+        Wait(120000)
+        RemoveBlip(blip)
+    end)
+end)
+
+-- ======================
 -- CLEANUP
 -- ======================
 
