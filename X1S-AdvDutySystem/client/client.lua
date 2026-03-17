@@ -255,6 +255,82 @@ RegisterNetEvent('x1s-duty:receive911', function(data)
 end)
 
 -- ======================
+-- PANIC BUTTON SYSTEM
+-- ======================
+
+RegisterCommand("panic", function()
+    if not onDuty then
+        TriggerEvent('chat:addMessage', {
+            color = {255, 0, 0},
+            args = {"SYSTEM", "❌ You must be on duty to use panic."}
+        })
+        return
+    end
+
+    local ped = PlayerPedId()
+    local coords = GetEntityCoords(ped)
+
+    local streetHash = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
+    local street = GetStreetNameFromHashKey(streetHash)
+
+    TriggerServerEvent('x1s-duty:panic', coords, street)
+end)
+
+-- Receive panic (ONLY on-duty officers)
+RegisterNetEvent('x1s-duty:receivePanic', function(data)
+    if not onDuty then return end
+
+    -- TOP BAR
+    TriggerEvent('chat:addMessage', {
+        color = {255, 0, 0},
+        multiline = true,
+        args = {"════════════ 🚨 OFFICER PANIC 🚨 ════════════"}
+    })
+
+    -- Officer info
+    TriggerEvent('chat:addMessage', {
+        color = {255, 255, 0},
+        args = {("👮‍♂️ [%s] %s"):format(data.callsign, data.name)}
+    })
+
+    TriggerEvent('chat:addMessage', {
+        color = {255, 255, 255},
+        args = {"────────────────────────────"}
+    })
+
+    -- Location
+    TriggerEvent('chat:addMessage', {
+        color = {0, 128, 255},
+        args = {("🗺️ Location: %s"):format(data.street)}
+    })
+
+    -- Bottom bar
+    TriggerEvent('chat:addMessage', {
+        color = {255, 0, 0},
+        multiline = true,
+        args = {"══════════════════════════════════════"}
+    })
+
+    -- Panic blip
+    local blip = AddBlipForCoord(data.coords.x, data.coords.y, data.coords.z)
+    SetBlipSprite(blip, 161)
+    SetBlipColour(blip, 1)
+    SetBlipScale(blip, 1.5)
+    SetBlipFlashes(blip, true)
+    SetBlipFlashInterval(blip, 500)
+
+    BeginTextCommandSetBlipName("STRING")
+    AddTextComponentString("🚨 Officer Panic")
+    EndTextCommandSetBlipName(blip)
+
+    -- Remove after 120 sec
+    CreateThread(function()
+        Wait(120000)
+        RemoveBlip(blip)
+    end)
+end)
+
+-- ======================
 -- CLEANUP
 -- ======================
 
