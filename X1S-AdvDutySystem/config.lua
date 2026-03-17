@@ -12,8 +12,10 @@ Config.Webhooks = {
     SAGW = "WEBHOOK_LINK_HERE"
 }
 
-Config.DispatchWebhook = "WEBHOOK_LINK_HERE"
+Config.DispatchWebhook = "WEBHOOK_LINK_HERE" -- 911 Call System
 Config.LEORoleID = "ROLEID_HERE" -- discord role ID to ping
+
+Config.PanicWebhook = "WEBHOOK_LINK_HERE" -- Panic System
 
 Config.Departments = {
     LSPD = {
