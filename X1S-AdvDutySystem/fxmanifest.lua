@@ -2,8 +2,8 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'X1Studios'
-description 'Advanced Standalone Duty System'
-version '1.1.0'
+description 'Advanced Standalone Duty System + 911 Call System and Panic System'
+version '1.2.0'
 
 ui_page 'html/index.html'
 
