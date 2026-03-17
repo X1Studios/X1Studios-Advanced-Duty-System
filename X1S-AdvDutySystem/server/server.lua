@@ -42,6 +42,18 @@ local function SendDispatchWebhook(payload)
     )
 end
 
+local function SendPanicWebhook(payload)
+    if not Config.PanicWebhook or Config.PanicWebhook == "" then return end
+
+    PerformHttpRequest(
+        Config.PanicWebhook,
+        function() end,
+        'POST',
+        json.encode(payload),
+        { ['Content-Type'] = 'application/json' }
+    )
+end
+
 -- ======================
 -- CHAT HELPER
 -- ======================
@@ -330,13 +342,107 @@ RegisterNetEvent('x1s-duty:911Call', function(reason, coords, street)
 end)
 
 -- ======================
--- CLEANUP
+-- PANIC BUTTON SYSTEM
 -- ======================
-AddEventHandler('playerDropped', function()
+
+RegisterNetEvent('x1s-duty:panic', function(coords, street)
     local src = source
-    if DutyPlayers[src] then
+    local officer = DutyPlayers[src]
+
+    if not officer then return end -- not on duty protection
+
+    local name = officer.name or "Unknown"
+    local callsign = officer.callsign or "000"
+
+    local payload = {
+        name = name,
+        callsign = callsign,
+        coords = coords,
+        street = street
+    }
+
+    -- Send to ALL on-duty officers
+    for id,_ in pairs(DutyPlayers) do
+        TriggerClientEvent('x1s-duty:receivePanic', id, payload)
+    end
+
+    -- Discord role ping (same as 911)
+    local mention = Config.LEORoleID and ("<@&%s>"):format(Config.LEORoleID) or ""
+
+    -- Send webhook
+    SendPanicWebhook({
+        content = mention,
+        allowed_mentions = { parse = { "roles" } },
+        username = "🚨 Panic Alerts",
+        embeds = {{
+            title = "🚨 OFFICER PANIC ACTIVATED",
+            color = 16711680,
+            fields = {
+                { name = "Officer", value = ("%s [%s]"):format(name, callsign), inline = true },
+                { name = "Server ID", value = tostring(src), inline = true },
+                { name = "Location", value = street, inline = false },
+                { name = "Coordinates",
+                  value = ("X: %.2f | Y: %.2f"):format(coords.x, coords.y),
+                  inline = false
+                }
+            },
+            footer = {
+                text = "X1Studios Panic System",
+                icon_url = Config.FooterIcon
+            },
+            timestamp = os.date('!%Y-%m-%dT%H:%M:%SZ')
+        }}
+    })
+
+    print(("[PANIC] %s [%s] @ %s")
+        :format(name, callsign, street))
+end)
+
+-- ======================
+-- DISCONNECT HANDLER
+-- ======================
+AddEventHandler('playerDropped', function(reason)
+    local src = source
+    local p = DutyPlayers[src]
+
+    if p then
+        local deptCfg = Config.Departments[p.department]
+        local dutyTime = math.floor((os.time() - p.start) / 60)
+
+        -- remove from duty
         DutyPlayers[src] = nil
         SyncDutyBlips()
+
+        -- send chat (optional, you can remove this if you don’t want global spam)
+        SendChat(-1, 'Duty', 
+            ("%s [%s] went OFF DUTY (Disconnected)"):format(p.name, p.callsign),
+            {255, 100, 100}
+        )
+
+        -- send webhook
+        SendDeptWebhook(p.department, {
+            username = 'Duty Logs',
+            embeds = {{
+                title = "⚠️ Disconnected While On Duty",
+                color = 16753920, -- orange
+                thumbnail = { url = deptCfg.webhookThumbnail },
+                fields = {
+                    { name = "Name", value = p.name, inline = true },
+                    { name = "Callsign", value = p.callsign, inline = true },
+                    { name = "Department", value = deptCfg.label, inline = true },
+                    { name = "Time on Duty", value = dutyTime .. " minutes", inline = true },
+                    { name = "Disconnect Reason", value = reason or "Unknown", inline = false }
+                },
+                footer = {
+                    text = "X1Studios Advanced Duty System",
+                    icon_url = Config.FooterIcon
+                },
+                timestamp = os.date('!%Y-%m-%dT%H:%M:%SZ')
+            }}
+        })
+
+        print(("[DUTY-DISCONNECT] %s [%s] (%s) disconnected while on duty")
+            :format(p.name, p.callsign, deptCfg.label))
     end
 end)
 
