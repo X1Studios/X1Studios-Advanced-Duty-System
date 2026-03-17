@@ -8,6 +8,8 @@ Advanced Duty System - X1Studios (SheriffX1)
 OnDuty - Command - "/dutymenu"
 OffDuty - Command - "/offduty"
 Supervisor Panel - Command - "/supervisormenu"
+911 - Command - "/911"
+Panic - Command - "/panic"
 
 Make sure to add your DC server GUILDID, DC bots token, DC webhook, and DC role ids into the config
 
@@ -31,3 +33,10 @@ X1Studios - https://discord.gg/TqcPD9Xee3
 - 911 Calls Get Sent To All On Duty Officers Only
 - 911 Call Blip Of The Location
 - 911 Call Webhook That Pings A Role
+
+----------------------------------------------------------
+
+!!! UPDATE - 1.2.0 !!!
+- Panic System
+- Disconnect Off Duty Logging
+- Changed 911 Call Blip
