@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X1S Duty System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="menu menu--duty" id="dutyMenu" aria-hidden="true" hidden>
+        <div class="menu-banner" role="img" aria-label="X1Studios Advanced Duty System"></div>
+        <div class="form-heading">
+            <span class="eyebrow" data-i18n="duty_subtitle">Officer Status</span>
+            <h1 data-i18n="duty_selection">Duty Selection</h1>
+            <p data-i18n="duty_help">Choose your department and enter your current duty identity.</p>
+        </div>
+
+        <label class="sr-only" for="department">Department</label>
+        <div class="field field--select">
+            <select id="department" aria-label="Department"></select>
+        </div>
+
+        <label class="field" for="name">
+            <span class="field__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm-9 9a9 9 0 0 1 18 0v1H3v-1Z"/></svg>
+            </span>
+            <input id="name" maxlength="40" autocomplete="off" placeholder="Enter your name" data-i18n-placeholder="enter_name">
+        </label>
+
+        <label class="field" for="callsign">
+            <span class="field__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M7.1 2.5 10 7 7.7 9.2c1.2 2.6 3.3 4.7 5.9 5.9l2.2-2.3 4.6 2.9c.6.4.8 1.1.5 1.7l-1.3 3.4c-.2.6-.8 1-1.5 1C9.4 21.4 2.5 14.5 2.1 5.9c0-.7.4-1.3 1-1.5l3.4-1.3c.6-.3 1.3 0 1.7.5Z"/></svg>
+            </span>
+            <input id="callsign" maxlength="16" autocomplete="off" placeholder="Enter your callsign" data-i18n-placeholder="enter_callsign">
+        </label>
+
+        <label class="field" for="rank">
+            <span class="field__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="m12 2 8 6-2.2 2.9L12 6.5l-5.8 4.4L4 8l8-6Zm0 7 8 6-2.2 2.9-5.8-4.4-5.8 4.4L4 15l8-6Zm0 7 8 6H4l8-6Z"/></svg>
+            </span>
+            <input id="rank" maxlength="32" autocomplete="off" placeholder="Enter your rank" data-i18n-placeholder="enter_rank">
+        </label>
+
+        <div class="buttons">
+            <button class="button button--secondary" id="cancelDuty" type="button" data-i18n="cancel">Cancel</button>
+            <button class="button button--primary" id="confirmDuty" type="button" data-i18n="confirm">Confirm</button>
+        </div>
+    </main>
+
+    <main class="menu menu--supervisor" id="supervisorMenu" aria-hidden="true" hidden>
+        <div class="menu-banner" role="img" aria-label="X1Studios Advanced Duty System"></div>
+        <div class="supervisor-heading">
+            <div>
+                <span class="eyebrow" data-i18n="command_overview">Command overview</span>
+                <h1 data-i18n="supervisor_panel">Supervisor Panel</h1>
+            </div>
+            <span class="officer-count" id="officerCount">0 officers</span>
+        </div>
+
+        <label class="search" for="searchInput">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 20-5.2-5.2a7.5 7.5 0 1 0-1.4 1.4L19.6 21 21 20ZM4 10.5a6.5 6.5 0 1 1 13 0 6.5 6.5 0 0 1-13 0Z"/></svg>
+            <input id="searchInput" autocomplete="off" placeholder="Search name, callsign, rank, or department" data-i18n-placeholder="search_officers">
+        </label>
+
+        <div class="table-shell">
+            <table>
+                <thead>
+                    <tr>
+                        <th aria-sort="ascending"><button type="button" data-sort="name"><span data-i18n="name">Name</span> <span class="sort-indicator">^</span></button></th>
+                        <th aria-sort="none"><button type="button" data-sort="callsign"><span data-i18n="callsign">Callsign</span> <span class="sort-indicator">-</span></button></th>
+                        <th aria-sort="none"><button type="button" data-sort="rank"><span data-i18n="rank">Rank</span> <span class="sort-indicator">-</span></button></th>
+                        <th aria-sort="none"><button type="button" data-sort="department"><span data-i18n="department">Dept</span> <span class="sort-indicator">-</span></button></th>
+                        <th aria-sort="none"><button type="button" data-sort="time"><span data-i18n="status">Status</span> <span class="sort-indicator">-</span></button></th>
+                        <th class="action-heading" data-i18n="action">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="supervisorList"></tbody>
+            </table>
+            <div class="empty-state" id="emptyState" data-i18n="no_officers">No on-duty officers match this view.</div>
+        </div>
+
+        <button class="button button--primary button--close" id="closeSupervisor" type="button" data-i18n="close">Close</button>
+    </main>
+
+    <main class="menu menu--emergency" id="emergencyMenu" aria-hidden="true" hidden>
+        <div class="menu-banner" role="img" aria-label="X1Studios Advanced Duty System"></div>
+        <div class="form-heading">
+            <span class="eyebrow" data-i18n="emergency_subtitle">911 Dispatch Request</span>
+            <h1 data-i18n="emergency_call">Emergency Call</h1>
+            <p data-i18n="emergency_help">Describe the emergency clearly. Your current location will be attached automatically.</p>
+        </div>
+
+        <label class="textarea-field" for="emergencyReason">
+            <span data-i18n="emergency_report">Emergency details</span>
+            <textarea
+                id="emergencyReason"
+                rows="6"
+                maxlength="256"
+                data-i18n-placeholder="emergency_placeholder"
+                placeholder="Describe what happened, who is involved, and any immediate danger..."
+            ></textarea>
+            <small><span id="emergencyCharacterCount">0</span>/<span id="emergencyCharacterLimit">256</span></small>
+        </label>
+
+        <div class="buttons">
+            <button class="button button--secondary" id="cancelEmergency" type="button" data-i18n="cancel">Cancel</button>
+            <button class="button button--primary" id="submitEmergency" type="button" data-i18n="send_emergency">Send 911 Call</button>
+        </div>
+    </main>
+
+    <div class="modal" id="confirmModal" aria-hidden="true" hidden>
+        <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <span class="modal-icon" aria-hidden="true">!</span>
+            <h2 id="modalTitle" data-i18n="confirm_action">Confirm Action</h2>
+            <p data-i18n="confirm_force_off">Force this officer off duty?</p>
+            <div class="buttons">
+                <button class="button button--secondary" id="cancelForce" type="button" data-i18n="cancel">Cancel</button>
+                <button class="button button--primary" id="confirmForce" type="button" data-i18n="force_off">Force Off</button>
+            </div>
+        </div>
+    </div>
+
+    <section class="notification-stack notification-stack--top-right" id="notificationStack" aria-live="polite"></section>
+    <script src="script.js"></script>
+</body>
+</html>
